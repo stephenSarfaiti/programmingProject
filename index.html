@@ -1,0 +1,44 @@
+<!doctype html>
+
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        var canvas, canvasContext;
+        
+        do{
+            name = prompt("What is your name?"); // asks the user what their name is and stores it in the name variable
+        }
+        while(name == "null" || name == "" ); // forces the user input something
+        
+        window.onload = function() {
+            canvas = document.getElementById('gameCanvas');
+            canvasContext = canvas.getContext('2d');
+
+            document.addEventListener('keydown', keyPressed);
+            document.addEventListener('keyup', keyReleased);
+            
+            setInterval(mainLoop, 1000 / 50);
+            restorePosition();
+        }
+        
+        /* ship info */
+        var shipXpos = 0;
+        var shipYpos = 0;
+        const SHIP_SIZE = 40;
+        
+        function mainLoop() {
+            colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
+            colorRect(shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
+        }
+        
+        function colorRect(x, y, w, h, color) {
+            canvasContext.fillStyle = color;
+            canvasContext.fillRect(x, y, w, h);
+        }
+        
+        function restorePosition() {
+            
+        }
+
+    </script>
+</body>
