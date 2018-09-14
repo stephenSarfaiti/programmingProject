@@ -14,8 +14,8 @@
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
 
-            document.addEventListener('keydown', keyPressed);
-            document.addEventListener('keyup', keyReleased);
+            document.addEventListener('keyleft', keyPressed);
+            document.addEventListener('keyright', keyReleased);
             
             setInterval(mainLoop, 1000 / 50);
             restorePosition();
@@ -25,6 +25,12 @@
         var shipXpos = 0;
         var shipYpos = 0;
         const SHIP_SIZE = 40;
+        
+        /* ship movement */
+        const LEFT_ARROW_KEY = 37;
+        const RIGHT_ARROW_KEY = 39;
+        var leftArrowKeyPressed = false;
+        var rightArrowKeyPressed = false;
         
         function mainLoop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
@@ -38,6 +44,24 @@
         
         function restorePosition() {
             
+        }
+        
+        function keyPressed(evt) {
+            if (evt.keyCode == LEFT_ARROW_KEY) {
+                leftArrowKeyPressed = true;
+            }
+            if (evt.keyCode == RIGHT_ARROW_KEY) {
+                rightArrowKeyPressed = true;
+            }
+        }
+
+        function keyReleased(evt) {
+            if (evt.keyCode == LEFT_ARROW_KEY) {
+                leftArrowKeyPressed = false;
+            }
+            if (evt.keyCode == RIGHT_ARROW_KEY) {
+                rightArrowKeyPressed = false;
+            }
         }
 
     </script>
