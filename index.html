@@ -18,7 +18,6 @@
             document.addEventListener('keyright', keyReleased);
             
             setInterval(mainLoop, 1000 / 50);
-            restorePosition();
         }
         
         /* ship info */
@@ -26,24 +25,24 @@
         var shipYpos = 0;
         const SHIP_SIZE = 40;
         
+        
         /* ship movement */
         const LEFT_ARROW_KEY = 37;
         const RIGHT_ARROW_KEY = 39;
         var leftArrowKeyPressed = false;
         var rightArrowKeyPressed = false;
+        var shipYspeed = 3;
         
         function mainLoop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
             colorRect(shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
+            
+            shipMove();
         }
         
         function colorRect(x, y, w, h, color) {
             canvasContext.fillStyle = color;
             canvasContext.fillRect(x, y, w, h);
-        }
-        
-        function restorePosition() {
-            
         }
         
         function keyPressed(evt) {
@@ -61,6 +60,15 @@
             }
             if (evt.keyCode == RIGHT_ARROW_KEY) {
                 rightArrowKeyPressed = false;
+            }
+        }
+        
+        function shipMove() {
+            if (leftArrowKeyPressed) {
+                shipYpos -= shipYspeed;
+            }
+            if (rightArrowKeyPressed) {
+                shipYpos += shipYspeed;
             }
         }
 
