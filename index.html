@@ -38,12 +38,15 @@
         var rightArrowKeyPressed = false;
         var shipXspeed = 4;
         
+        var score = 0;
+        
         function mainLoop() {
             colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
             //colorRect(shipXpos ,shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
             drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
             shipMove();
-            
+            drawText(20,20,'White','Score: ' + score, '20px Arial');
+             
         }
         
         function loadImgAssets(){
@@ -51,6 +54,8 @@
             
             imgs.ship = new Image();
             imgs.ship.src = 'ship.png';
+            
+            
             
             return imgs;
         }
@@ -91,6 +96,11 @@
             }
         }
         
+        function drawText(x,y,color,msg, sizeStyle){
+            canvasContext.fillStyle = color;
+            canvasContext.fillText(msg,x,y);
+            canvasContext.font = sizeStyle;
+        }
         
     </script>
 </body>
