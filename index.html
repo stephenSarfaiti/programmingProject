@@ -4,15 +4,13 @@
     <canvas id="gameCanvas" width="400" height="600"></canvas>
     <script>
         /*do{
-            name = prompt("What is your name?"); // asks the user what their name is and stores it in the name variable
+            name = prompt("What is your name?"); // This prompts the user to enter their name stores it in the name variable
         }
-        while(name == "null" || name == "" ); // forces the user input something*/
+        while(name == "null" || name == "" ); // This makes sure the user can't enter a blank name or press cancel*/
         var canvas, canvasContext, imageAssets;
         
         
-    
-        
-        window.onload = function() {
+        window.onload = function() { 
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             imageAssets = loadImgAssets();
@@ -22,34 +20,47 @@
             document.addEventListener('keydown', keyPressed); 
             document.addEventListener('keyup', keyReleased)
             
-            setInterval(mainLoop, 1000 / 50);
+            setInterval(mainLoop, 1000 / 50); // This sets how fast the mainLoop is updated every second, currently it is 50 frames/second
         }
         
-        /* ship info */
+        /* ship info, delcares the variables for the ship */
         var shipXpos = 200;
         var shipYpos = 530;
         const SHIP_SIZE = 60;
         
         
-        /* ship movement */
+        /* ship movement, declares the variables in order for the ship to move */
         const LEFT_ARROW_KEY = 37;
         const RIGHT_ARROW_KEY = 39;
         var leftArrowKeyPressed = false;
         var rightArrowKeyPressed = false;
         var shipXspeed = 4;
         
+        var startingPos = true;
+        var GameRun = true;
         var score = 0;
+        var hit
         
-        function mainLoop() {
-            colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
-            //colorRect(shipXpos ,shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
-            drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
-            shipMove();
-            drawText(20,20,'White','Score: ' + score, '20px Arial');
+        function mainLoop() { // The main loop function, this is updated 50 times a second
+            if(GameRun){
+                if (startingPos) {
+                    startPos();
+                    startingPos = false;
+                }
+                colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
+                //colorRect(shipXpos ,shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
+                drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
+                shipMove();
+                drawText(20,20,'White','Score: ' + score, '20px Arial');
              
+                
+            }
+            gameOver();
+            if(GameRun == false){
+            } 
         }
         
-        function loadImgAssets(){
+        function loadImgAssets(){ // This function loads all the images for the game
             imgs = {};
             
             imgs.ship = new Image();
@@ -60,7 +71,7 @@
             return imgs;
         }
         
-        function drawShip(img, dX, dY, dW, dH){
+        function drawShip(img, dX, dY, dW, dH){ // This draws the ship onto the canvas
             canvasContext.drawImage(img, dX, dY, dW, dH);
         }
         
@@ -69,7 +80,7 @@
             canvasContext.fillRect(x, y, w, h);
         }
         
-        function keyPressed(evt) {
+        function keyPressed(evt) { // This function changes ArrowKeyPressed to true when the corresponding key is pressed
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = true;
             }
@@ -78,7 +89,7 @@
             }
         }
 
-        function keyReleased(evt) {
+        function keyReleased(evt) { // This function changes ArrowKeyPressed to false when the corresponding key is released
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = false;
             }
@@ -87,7 +98,7 @@
             }
         }
         
-        function shipMove() {
+        function shipMove() { // This function updates the ship's X position with the X speed when ArrowKeyPressed is true
             if (leftArrowKeyPressed) {
                 shipXpos -= shipXspeed;
             }
@@ -96,11 +107,22 @@
             }
         }
         
-        function drawText(x,y,color,msg, sizeStyle){
+        function drawText(x,y,color,msg, sizeStyle){ // This function draws test onto the canvas
             canvasContext.fillStyle = color;
             canvasContext.fillText(msg,x,y);
             canvasContext.font = sizeStyle;
         }
+        
+        function gameOver(){
+            if(hit){
+                GameRun = false;
+            }
+        }
+        
+        function startPos() {
+            shipXpos = canvas.width / 2 - SHIP_SIZE / 2;
+        }
+
         
     </script>
 </body>
