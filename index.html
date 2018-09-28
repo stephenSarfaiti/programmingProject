@@ -113,13 +113,13 @@
             canvasContext.font = sizeStyle;
         }
         
-        function gameOver(){
+        function gameOver(){ // This function changes the GameRun boolean to false when hit is true
             if(hit){
                 GameRun = false;
             }
         }
         
-        function startPos() {
+        function startPos() { // This function when called sets the X position of the ship to the middle
             shipXpos = canvas.width / 2 - SHIP_SIZE / 2;
         }
 
