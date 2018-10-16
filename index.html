@@ -2,42 +2,38 @@
 
 <body>
     <canvas id="gameCanvas" width="400" height="600"></canvas>
-    <script>
-        /*do{
-            name = prompt("What is your name?"); // This prompts the user to enter their name stores it in the name variable
+        <script>
+        var username = ''; // Creates an empty variable for the username to be stored in
+        while(username == '') { // This loop prevents the user from hitting cancel or entering a blank answer
+            username = prompt('What is your name?') || ''; // Prompts the user to enter their name
         }
-        while(name == "null" || name == "" ); // This makes sure the user can't enter a blank name or press cancel*/
-        var canvas, canvasContext, imageAssets;
-        
-        
+        var canvas, canvasContext, imageAssets; // Defines the major variables in order for canvas to work properly
+               
         window.onload = function() { 
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             imageAssets = loadImgAssets();
-            
-            
-            
+
             document.addEventListener('keydown', keyPressed); 
             document.addEventListener('keyup', keyReleased)
             
             setInterval(mainLoop, 1000 / 50); // This sets how fast the mainLoop is updated every second, currently it is 50 frames/second
         }
         
-        // ship info, delcares the variables for the ship
+        // Ship info, delcares the variables for the ship
         var shipXpos = 200;
         var shipYpos = 530;
         const SHIP_SIZE = 60;
         
         
-        // ship movement, declares the variables in order for the ship to move
+        // Ship movement, declares the variables in order for the ship to move
         const LEFT_ARROW_KEY = 37;
         const RIGHT_ARROW_KEY = 39;
         var leftArrowKeyPressed = false;
         var rightArrowKeyPressed = false;
         var shipXspeed = 4;
         
-        // bullet info, declares the variables for the bullet
-        
+        // Bullet info, declares the variables for the bullet        
         var bulletVisible = false;
         var bulletYpos = -50;
         var bulletXpos = 50;
@@ -47,57 +43,56 @@
         const SPACE_BAR = 32;
         var spaceBarPressed = false;
         
+        // General variables
         var startingPos = true;
         var GameRun = true;
         var score = 0;
         var hit;
         
         function mainLoop() { // The main loop function, this is updated 50 times a second
-            if(GameRun){
+            if(GameRun){ // Only runs these if GameRun is set to true, when they die it is set to false which stops the game
                 if (startingPos) {
                     startPos();
-                    startingPos = false;
+                    startingPos = false; // Sets to true at the start, when it does it places the ship in the center of screen, then sets startingPos to false
                 }
                 colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
                 //colorRect(shipXpos ,shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
                 drawText(20,20,'White','Score: ' + score, '20px Arial');
                 drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
-                shipMove();
+                shipMove(); // Draws the ship
                 drawBullet(imageAssets.bullet, bulletXpos, bulletYpos, BULLET_WIDTH, BULLET_HEIGHT);
-                bulletMove();
+                bulletMove(); // Draws the bullet
                 
             }
 
-            if(GameRun == false){
-            } 
         }
         
         function loadImgAssets(){ // This function loads all the images for the game
             imgs = {};
             
-            imgs.ship = new Image();
-            imgs.ship.src = 'images/ship.png';
+            imgs.ship = new Image(); // Defines a new image
+            imgs.ship.src = 'images/ship.png'; // Where the image is located
             imgs.bullet = new Image();
             imgs.bullet.src = 'images/bullet.png';
             
             
-            return imgs;
+            return imgs; // Returns all the images to the array
         }
         
-        function drawShip(img, dX, dY, dW, dH){ // This draws the ship onto the canvas
+        function drawShip(img, dX, dY, dW, dH){ // This function draws the ship onto the canvas
             canvasContext.drawImage(img, dX, dY, dW, dH);
         }
         
-        function drawBullet(img, dX, dY, dW, dH){ // This draws the ship onto the canvas
+        function drawBullet(img, dX, dY, dW, dH){ // This function draws the bullet onto the canvas
             canvasContext.drawImage(img, dX, dY, dW, dH);
         }
         
-        function colorRect(x, y, w, h, color) {
+        function colorRect(x, y, w, h, color) { // This function gives the colorRect to be called with the specific position, size and color for the colorRect
             canvasContext.fillStyle = color;
             canvasContext.fillRect(x, y, w, h);
         }
         
-        function keyPressed(evt) { // This function changes ArrowKeyPressed to true when the corresponding key is pressed
+        function keyPressed(evt) { // This function changes *keyPressed to true when the corresponding key is pressed
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = true;
             }
@@ -109,7 +104,7 @@
             }
         }
 
-        function keyReleased(evt) { // This function changes ArrowKeyPressed to false when the corresponding key is released
+        function keyReleased(evt) { // This function changes *keyPressed to false when the corresponding key is released
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = false;
             }
@@ -130,25 +125,21 @@
             }
         }
         
-        function bulletMove() {
+        function bulletMove() { // This function updates bullets's X position with the X speed when spaceBarPressed is true
             if (spaceBarPressed & bulletYpos < 0) {
-                bulletXpos = shipXpos + 18;
+                bulletXpos = shipXpos + 18; // Testing at the moment
                 bulletYpos = shipYpos - 40;
             }
         }
         
-        function drawText(x,y,color,msg, sizeStyle){ // This function draws test onto the canvas
+        function drawText(x,y,color,msg, sizeStyle){ // This function draws text onto the canvas
             canvasContext.fillStyle = color;
             canvasContext.fillText(msg,x,y);
             canvasContext.font = sizeStyle;
         }
         
-        function startPos() { // This function when called sets the X position of the ship to the middle
+        function startPos() { // This function sets the X position of the ship to the middle when the game is started
             shipXpos = canvas.width / 2 - SHIP_SIZE / 2;
-        }
-
-        function hideBullet(){
-            bulletYpos = 700;
         }
     </script>
 </body>
