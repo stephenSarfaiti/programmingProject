@@ -7,13 +7,17 @@
         while(username == '') { // This loop prevents the user from hitting cancel or entering a blank answer
             username = prompt('What is your name?') || ''; // Prompts the user to enter their name
         }
+        
+        var difficulty = '';
+        while(difficulty == '' & difficulty != 'easy' & difficulty != 'medium' & difficulty != 'hard') {
+            difficulty = prompt('What difficulty do you want to play? Easy, Medium or Hard?') || '';
+        }
         var canvas, canvasContext, imageAssets; // Defines the major variables in order for canvas to work properly
-               
+                
         window.onload = function() { 
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
             imageAssets = loadImgAssets();
-
             document.addEventListener('keydown', keyPressed); 
             document.addEventListener('keyup', keyReleased)
             
@@ -64,7 +68,6 @@
                 bulletMove(); // Draws the bullet
                 
             }
-
         }
         
         function loadImgAssets(){ // This function loads all the images for the game
@@ -103,7 +106,6 @@
                 spaceBarPressed = true;
             }
         }
-
         function keyReleased(evt) { // This function changes *keyPressed to false when the corresponding key is released
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = false;
