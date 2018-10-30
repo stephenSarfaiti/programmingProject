@@ -40,8 +40,8 @@
         if(difficulty == 'normal') { // Same thing but sets it to 5 when they enter normal
 	       enemyAmount = 5;
         }
-        if(difficulty == 'hard') { // And 10 when they enter hard
-            enemyAmount = 10;
+        if(difficulty == 'hard') { // And 7 when they enter hard
+            enemyAmount = 7;
         }
             
         var canvas, canvasContext, imageAssets; // Defines the major variables in order for canvas to work properly
@@ -62,18 +62,18 @@
             
         // Enemy info, declares the variables for the enemies
         const ENEMY_SIZE = 60;
-        var enemyXpos = Math.floor((Math.random() * 400) + 20);
-        var enemyYpos = -50;
-        var enemyXspeed = Math.floor((Math.random() * 5) + 3);
-        var enemyYspeed = Math.floor((Math.random() * 5) + 2);
-        var blockArray = [];
+        var enemyXpos = Math.floor((Math.random() * 400) + 20); // Picks a random number between 20 and 400, 400 is the width of the canvas
+        var enemyYpos = -50; 
+        var enemyXspeed = Math.floor((Math.random() * 5) + 3); // Picks a random number betweeen 3 and 5 for the x speed
+        var enemyYspeed = Math.floor((Math.random() * 5) + 2); // Picks a random number betweeen 2 and 5 for the y speed
+        var blockArray = []; // Holds the enemies in a block array
             
         // General variables
         var startingPos = true;
         var GameRun = true;
         var score = 0;
         var hit = false;
-        var runRandom = true;
+        var randomGen = true;
             
         function mainLoop() { // The main loop function, this is updated 50 times a second
             if(GameRun){ // Only runs these if GameRun is set to true, when they die it is set to false which stops the game
@@ -81,19 +81,40 @@
                     startPos();
                     startingPos = false; // Sets to true at the start, when it does it places the ship in the center of screen, then sets startingPos to false
                 }
-                colorRect(0, 0, canvas.width, canvas.height, 'black') //bg
+                colorRect(0, 0, canvas.width, canvas.height, 'black') // Draws the background
                 //colorRect(shipXpos ,shipYpos, SHIP_SIZE, SHIP_SIZE, 'white')
                 drawText(20,20,'White','Score: ' + score, '20px Arial');
                 drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
                 shipMove(); // Draws the ship
-                render();
+                blockDraw();
                 enemyMovement();
+                if(score == 10){
+                    enemyYspeed = Math.floor((Math.random() * 10) + 5); // Picks a random number betweeen 5 and 10 for the y speed
+                }
+                if(score == 20){
+                    enemyYspeed = Math.floor((Math.random() * 15) + 10); // Picks a random number betweeen 10 and 15 for the y speed
+                }
+                if(score == 30){
+                    enemyYspeed = Math.floor((Math.random() * 17) + 15); // Picks a random number betweeen 15 and 17 for the y speed
+                }
+                if(score == 40){
+                    enemyYspeed = Math.floor((Math.random() * 20) + 17); // Picks a random number betweeen 17 and 20 for the y speed
+                }
+                if(score == 50){
+                    enemyYspeed = Math.floor((Math.random() * 30) + 20); // Picks a random number betweeen 20 and 30 for the y speed
+                }
                 
+                if(hit){ // If hit is set to true it stops the game and displays the score
+                    GameRun = false;
+                    colorRect(0, 0, canvas.width, canvas.height, 'black') // Background
+                    drawText(canvas.width/2-175,canvas.height/2 -90, 'white','Well done ' + username,'30px Arial'); // Writes well done to the user
+                    drawText(canvas.width/2-175,canvas.height/2 -50, 'white','You scored ' + score,'25px Arial'); // Tells them their score
+                }
             }
-            if(runRandom){// when runRandom is true allows the funcitons listed to be run
-	       randomEnemies();
-	       runRandom = false;
-	}
+            if(randomGen){// When this is true it allows the randomEnemies function to run
+	           randomEnemies();
+	           randomGen = false;
+	        }
         }
         function loadImgAssets(){ // This function loads all the images for the game
             imgs = {};
@@ -127,6 +148,7 @@
                 rightArrowKeyPressed = true;
             }
         }
+            
         function keyReleased(evt) { // This function changes *keyPressed to false when the corresponding key is released
             if (evt.keyCode == LEFT_ARROW_KEY) {
                 leftArrowKeyPressed = false;
@@ -155,44 +177,47 @@
             shipXpos = canvas.width / 2 - SHIP_SIZE / 2;
         }
         
-        function render(){ 
+        function blockDraw(){ // This function draws the enemies to push into the array
             blockArray.forEach(function(block, index) {
                drawEnemies(block.enemyXpos,block.enemyYpos, imageAssets.enemies,block.ENEMY_SIZE,block.ENEMY_SIZE);
             });
         }
             
-        function enemyMovement(){
-	       blockArray.forEach(function (block,index) {
+        function enemyMovement(){ // This function moves the enemies
+	        blockArray.forEach(function (block,index) {
 
-		block.enemyXpos = block.enemyXpos + block.enemyXSpeed;
-		block.enemyYpos = block.enemyYpos + block.enemyYSpeed;
+		    block.enemyXpos = block.enemyXpos + block.enemyXSpeed; 
+		    block.enemyYpos = block.enemyYpos + block.enemyYSpeed;
                
-		if(block.enemyXpos < 0){
-			block.enemyXSpeed = block.enemyXSpeed * -1;
-		}
-		if(block.enemyXpos > canvas.width - block.ENEMY_SIZE){
-			block.enemyXSpeed = block.enemyXSpeed * -1;
-		}
+            if(block.enemyXpos < 0){ // Checks if the enemy is against a side
+                block.enemyXSpeed = block.enemyXSpeed * -1;
+		    }
+                
+		    if(block.enemyXpos > canvas.width - block.ENEMY_SIZE){
+                block.enemyXSpeed = block.enemyXSpeed * -1;
+		    }
 
-		if(block.enemyYpos > canvas.height ){
-			score++;
-			block.enemyYpos = 0;
-		}
-	   if(
-		block.enemyXpos > (shipXpos - SHIP_SIZE + 20) 
-		&&
-		block.enemyXpos < (shipXpos + block.ENEMY_SIZE - 20)
-		&& 
-		block.enemyYpos > (shipYpos - block.ENEMY_SIZE + 20)
-		&&
-		block.enemyYpos < (shipYpos + block.ENEMY_SIZE) 
-	){
-        hit = true; 
-	}
-	});
-	}
-	function randomEnemies(){
-	var newBlockObject = {
+		    if(block.enemyYpos > canvas.height ){ // Scores the user if they don't get hit by an enemy
+                score++;
+                block.enemyYpos = 0;
+            }
+                
+            if( // Detects when the player is hit
+                block.enemyXpos > (shipXpos - SHIP_SIZE + 20) 
+            &&
+                block.enemyXpos < (shipXpos + block.ENEMY_SIZE - 20)
+            && 
+                block.enemyYpos > (shipYpos - block.ENEMY_SIZE + 20)
+            &&
+                block.enemyYpos < (shipYpos + block.ENEMY_SIZE) 
+            ){
+                hit = true; // Runs the function above to stop the game and congratulate the user
+            }
+        });
+        }
+            
+        function randomEnemies(){ // Randomly generates enemy variables so they're not all the same
+        var newBlockObject = {
 		ENEMY_SIZE: ENEMY_SIZE,
 		ENEMY_SIZE: ENEMY_SIZE,
 		enemyXpos: Math.floor(Math.random() * (canvas.width - ENEMY_SIZE)) + 0,
@@ -200,8 +225,9 @@
 		enemyXSpeed: Math.floor(Math.random() * (5)) + 1,
 		enemyYSpeed: Math.floor(Math.random() * (5)) + 1,
 	}
-	return newBlockObject;
-}
-            
+        
+	return newBlockObject; // Returns them to the function
+
+    }
     </script>
 </body>
