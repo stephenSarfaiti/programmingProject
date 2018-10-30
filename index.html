@@ -1,19 +1,13 @@
 <!doctype html>
-
+<style> /* Styles the website part of the program */
+    html{
+        background-color: grey;
+    }
+</style>
 <body>
     <canvas id="gameCanvas" width="400" height="600"></canvas>
         <script>
-        var username = ''; // Creates an empty variable for the username to be stored in
-        while(username == '') { // This loop prevents the user from hitting cancel or entering a blank answer
-            username = prompt('What is your name?') || ''; // Prompts the user to enter their name
-        }
         
-        var difficulty = '';
-        while(difficulty == '' & difficulty != 'easy' & difficulty != 'medium' & difficulty != 'hard') {
-            difficulty = prompt('What difficulty do you want to play? Easy, Medium or Hard?') || '';
-        }
-        var canvas, canvasContext, imageAssets; // Defines the major variables in order for canvas to work properly
-                
         window.onload = function() { 
             canvas = document.getElementById('gameCanvas');
             canvasContext = canvas.getContext('2d');
@@ -21,8 +15,37 @@
             document.addEventListener('keydown', keyPressed); 
             document.addEventListener('keyup', keyReleased)
             
+            for(var i = 0; i < enemyAmount; i++) {
+                blockArray.push(randomEnemies());
+	        }
+            
             setInterval(mainLoop, 1000 / 50); // This sets how fast the mainLoop is updated every second, currently it is 50 frames/second
         }
+        var username = ''; // Creates an empty variable for the username to be stored in
+        while(username == '') { // This loop prevents the user from hitting cancel or entering a blank answer
+            username = prompt('What is your name?', 'Stevo') || ''; // Prompts the user to enter their name, and the default entry is Stevo
+        }
+        
+        var difficulty = ''; // Creates an empty variable for the difficulty to be stored in
+        var enemyAmount = ''; // Creates an empty variable to store how many enemies there will be on screen at once
+            
+        while(difficulty != 'simple' && difficulty != 'normal' && difficulty != 'hard'){ // Keeps the loop running until one of these options is entered
+	       difficulty = prompt('What difficulty do you want to play? Simple, Normal or Hard?', 'normal') || ''; // Prompts the user to enter their preferred difficulty, default entry is normal
+	       difficulty = difficulty.toLowerCase(); // Converts all characters the user has entered to lower case, this is so the program accepts it even if they capitalize some of the characters by mistake
+        }
+        
+        if(difficulty == 'simple') { // Sets the amount of enemies to 2 when the user enters simple as the difficulty
+	       enemyAmount = 2;
+        }
+        if(difficulty == 'normal') { // Same thing but sets it to 5 when they enter normal
+	       enemyAmount = 5;
+        }
+        if(difficulty == 'hard') { // And 10 when they enter hard
+            enemyAmount = 10;
+        }
+            
+        var canvas, canvasContext, imageAssets; // Defines the major variables in order for canvas to work properly
+                
         
         // Ship info, delcares the variables for the ship
         var shipXpos = 200;
@@ -33,26 +56,25 @@
         // Ship movement, declares the variables in order for the ship to move
         const LEFT_ARROW_KEY = 37;
         const RIGHT_ARROW_KEY = 39;
-        var leftArrowKeyPressed = false;
+        const shipXspeed = 10;
+        var leftArrowKeyPressed = false;  
         var rightArrowKeyPressed = false;
-        var shipXspeed = 4;
-        
-        // Bullet info, declares the variables for the bullet        
-        var bulletVisible = false;
-        var bulletYpos = -50;
-        var bulletXpos = 50;
-        const BULLET_WIDTH = 25;
-        const BULLET_HEIGHT = 50;
-        var bulletSpeed = 5;
-        const SPACE_BAR = 32;
-        var spaceBarPressed = false;
-        
+            
+        // Enemy info, declares the variables for the enemies
+        const ENEMY_SIZE = 60;
+        var enemyXpos = Math.floor((Math.random() * 400) + 20);
+        var enemyYpos = -50;
+        var enemyXspeed = Math.floor((Math.random() * 5) + 3);
+        var enemyYspeed = Math.floor((Math.random() * 5) + 2);
+        var blockArray = [];
+            
         // General variables
         var startingPos = true;
         var GameRun = true;
         var score = 0;
-        var hit;
-        
+        var hit = false;
+        var runRandom = true;
+            
         function mainLoop() { // The main loop function, this is updated 50 times a second
             if(GameRun){ // Only runs these if GameRun is set to true, when they die it is set to false which stops the game
                 if (startingPos) {
@@ -64,20 +86,22 @@
                 drawText(20,20,'White','Score: ' + score, '20px Arial');
                 drawShip(imageAssets.ship, shipXpos, shipYpos, SHIP_SIZE, SHIP_SIZE);
                 shipMove(); // Draws the ship
-                drawBullet(imageAssets.bullet, bulletXpos, bulletYpos, BULLET_WIDTH, BULLET_HEIGHT);
-                bulletMove(); // Draws the bullet
+                render();
+                enemyMovement();
                 
             }
+            if(runRandom){// when runRandom is true allows the funcitons listed to be run
+	       randomEnemies();
+	       runRandom = false;
+	}
         }
-        
         function loadImgAssets(){ // This function loads all the images for the game
             imgs = {};
             
-            imgs.ship = new Image(); // Defines a new image
-            imgs.ship.src = 'images/ship.png'; // Where the image is located
-            imgs.bullet = new Image();
-            imgs.bullet.src = 'images/bullet.png';
-            
+            imgs.ship = new Image(); // Creates and defines a new image
+            imgs.ship.src = 'images/ship.png'; // Tells the site where the image is located from the root directory
+            imgs.enemies = new Image();
+            imgs.enemies.src = 'images/enemy.png';
             
             return imgs; // Returns all the images to the array
         }
@@ -86,8 +110,8 @@
             canvasContext.drawImage(img, dX, dY, dW, dH);
         }
         
-        function drawBullet(img, dX, dY, dW, dH){ // This function draws the bullet onto the canvas
-            canvasContext.drawImage(img, dX, dY, dW, dH);
+        function drawEnemies(topLeftX,topLeftY,img,width,height){
+            canvasContext.drawImage(img,topLeftX,topLeftY,width,height);
         }
         
         function colorRect(x, y, w, h, color) { // This function gives the colorRect to be called with the specific position, size and color for the colorRect
@@ -102,9 +126,6 @@
             if (evt.keyCode == RIGHT_ARROW_KEY) {
                 rightArrowKeyPressed = true;
             }
-            if (evt.keyCode == SPACE_BAR) {
-                spaceBarPressed = true;
-            }
         }
         function keyReleased(evt) { // This function changes *keyPressed to false when the corresponding key is released
             if (evt.keyCode == LEFT_ARROW_KEY) {
@@ -112,9 +133,6 @@
             }
             if (evt.keyCode == RIGHT_ARROW_KEY) {
                 rightArrowKeyPressed = false;
-            }
-            if (evt.keyCode == SPACE_BAR) {
-                spaceBarPressed = false;
             }
         }
         
@@ -126,14 +144,7 @@
                 shipXpos += shipXspeed;
             }
         }
-        
-        function bulletMove() { // This function updates bullets's X position with the X speed when spaceBarPressed is true
-            if (spaceBarPressed & bulletYpos < 0) {
-                bulletXpos = shipXpos + 18; // Testing at the moment
-                bulletYpos = shipYpos - 40;
-            }
-        }
-        
+               
         function drawText(x,y,color,msg, sizeStyle){ // This function draws text onto the canvas
             canvasContext.fillStyle = color;
             canvasContext.fillText(msg,x,y);
@@ -143,5 +154,54 @@
         function startPos() { // This function sets the X position of the ship to the middle when the game is started
             shipXpos = canvas.width / 2 - SHIP_SIZE / 2;
         }
+        
+        function render(){ 
+            blockArray.forEach(function(block, index) {
+               drawEnemies(block.enemyXpos,block.enemyYpos, imageAssets.enemies,block.ENEMY_SIZE,block.ENEMY_SIZE);
+            });
+        }
+            
+        function enemyMovement(){
+	       blockArray.forEach(function (block,index) {
+
+		block.enemyXpos = block.enemyXpos + block.enemyXSpeed;
+		block.enemyYpos = block.enemyYpos + block.enemyYSpeed;
+               
+		if(block.enemyXpos < 0){
+			block.enemyXSpeed = block.enemyXSpeed * -1;
+		}
+		if(block.enemyXpos > canvas.width - block.ENEMY_SIZE){
+			block.enemyXSpeed = block.enemyXSpeed * -1;
+		}
+
+		if(block.enemyYpos > canvas.height ){
+			score++;
+			block.enemyYpos = 0;
+		}
+	   if(
+		block.enemyXpos > (shipXpos - SHIP_SIZE + 20) 
+		&&
+		block.enemyXpos < (shipXpos + block.ENEMY_SIZE - 20)
+		&& 
+		block.enemyYpos > (shipYpos - block.ENEMY_SIZE + 20)
+		&&
+		block.enemyYpos < (shipYpos + block.ENEMY_SIZE) 
+	){
+        hit = true; 
+	}
+	});
+	}
+	function randomEnemies(){
+	var newBlockObject = {
+		ENEMY_SIZE: ENEMY_SIZE,
+		ENEMY_SIZE: ENEMY_SIZE,
+		enemyXpos: Math.floor(Math.random() * (canvas.width - ENEMY_SIZE)) + 0,
+		enemyYpos: enemyYpos * 0,
+		enemyXSpeed: Math.floor(Math.random() * (5)) + 1,
+		enemyYSpeed: Math.floor(Math.random() * (5)) + 1,
+	}
+	return newBlockObject;
+}
+            
     </script>
 </body>
